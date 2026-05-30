@@ -9,7 +9,9 @@ class ArchAgent(BaseAgent):
     SKILLS = [CONFLUENCE, GITHUB, CODE_TOOLS, JIRA]
 
 
-async def run(ticket_key: str, pr_number: int | None = None, verbose: bool = False) -> str:
+async def run(
+    ticket_key: str, pr_number: int | None = None, verbose: bool = False
+) -> str:
     prompt = f"Architecture review for Jira ticket {ticket_key}."
     if pr_number:
         prompt += f" Review PR #{pr_number} for architectural concerns."

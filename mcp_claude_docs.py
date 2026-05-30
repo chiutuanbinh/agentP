@@ -24,7 +24,11 @@ def _fetch_doc(url: str) -> str:
     for tag in soup(["nav", "header", "footer", "script", "style"]):
         tag.decompose()
     main = soup.find("main") or soup.find("article") or soup.body
-    return main.get_text(separator="\n", strip=True) if main else soup.get_text(separator="\n", strip=True)
+    return (
+        main.get_text(separator="\n", strip=True)
+        if main
+        else soup.get_text(separator="\n", strip=True)
+    )
 
 
 @mcp.tool()

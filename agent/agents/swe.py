@@ -15,7 +15,9 @@ class SWEAgent(BaseAgent):
         return raw.replace("{WORKSPACE}", str(WORKSPACE))
 
 
-async def run(ticket_key: str, repo_path: str | None = None, verbose: bool = False) -> str:
+async def run(
+    ticket_key: str, repo_path: str | None = None, verbose: bool = False
+) -> str:
     prompt = f"Implement Jira ticket {ticket_key}."
     if repo_path:
         prompt += f" The repository is already checked out at {repo_path}."
