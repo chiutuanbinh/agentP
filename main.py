@@ -1,5 +1,5 @@
 def main():
-    print("Hello from claude-experiment!")
+    print("Hello from claude-experiment!")  # noqa: T201
 
 
 if __name__ == "__main__":

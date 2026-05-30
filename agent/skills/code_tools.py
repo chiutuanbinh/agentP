@@ -12,6 +12,7 @@ CODE_TOOLS = Skill(
 - Linting: `ruff check . --fix && ruff format .` (Python); `eslint . --fix` (JS/TS)
 - Check pyproject.toml or package.json for project-specific lint/format commands
 - Never reformat unrelated code
-- Commit messages: `<type>(<scope>): <subject>` — subject ≤72 chars; types: feat/fix/refactor/test/docs/chore
+- Commit messages: `<type>(<scope>): <subject>`
+  — subject ≤72 chars; types: feat/fix/refactor/test/docs/chore
 """,
 )

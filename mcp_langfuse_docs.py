@@ -101,7 +101,7 @@ def get_langfuse_openapi_spec() -> dict:
                     "content-type", ""
                 ):
                     return resp.json()
-            except Exception:
+            except Exception:  # noqa: S112
                 continue
     # Fall back to public API spec from GitHub
     try:
@@ -111,7 +111,7 @@ def get_langfuse_openapi_spec() -> dict:
             )
             if resp.status_code == 200:
                 return {"source": "github-fern-yaml", "content": resp.text[:8000]}
-    except Exception:
+    except Exception:  # noqa: S110
         pass
     return {"error": "OpenAPI spec not found locally or remotely", "tried": candidates}
 
