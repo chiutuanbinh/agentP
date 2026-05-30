@@ -1,0 +1,19 @@
+[project]
+name = "claude-experiment"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "beautifulsoup4>=4.14.3",
+    "claude-agent-sdk>=0.2.87",
+    "google-adk>=1.18.0",
+    "httpx>=0.28.1",
+    "mcp>=1.27.2",
+    "ruff>=0.15.15",
+]
+
+[project.optional-dependencies]
+agent = [
+    "langfuse>=4.7.1",
+]

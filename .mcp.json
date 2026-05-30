@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "claude-sdk-docs": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "python", "mcp_claude_docs.py"],
+      "cwd": "/Users/binhct/workspace/claude-experiment"
+    },
+    "langfuse-docs": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "python", "mcp_langfuse_docs.py"],
+      "cwd": "/Users/binhct/workspace/claude-experiment"
+    },
+    "langfuse-official": {
+      "type": "http",
+      "url": "https://langfuse.com/api/mcp"
+    }
+  }
+}
