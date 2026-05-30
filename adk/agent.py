@@ -23,6 +23,6 @@ root_agent = Agent(
     name="assistant",
     model="gemini-1.5-flash",
     description="A helpful assistant that can answer questions and check the weather.",
-    instruction="You are a helpful assistant. Use the available tools to answer user questions accurately.",
+    instruction="You are a helpful assistant. Use the available tools to answer user questions accurately.",  # noqa: E501
     tools=[],
 )

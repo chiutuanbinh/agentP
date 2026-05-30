@@ -9,11 +9,11 @@ from .security_audit import SECURITY_AUDIT
 from .testing import TESTING
 
 __all__ = [
-    "Skill",
-    "JIRA",
-    "GITHUB",
-    "CONFLUENCE",
     "CODE_TOOLS",
-    "TESTING",
+    "CONFLUENCE",
+    "GITHUB",
+    "JIRA",
     "SECURITY_AUDIT",
+    "TESTING",
+    "Skill",
 ]

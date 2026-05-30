@@ -16,9 +16,9 @@ REGISTRY: dict[str, type] = {
 
 __all__ = [
     "REGISTRY",
-    "SWEAgent",
+    "ArchAgent",
     "PMAgent",
     "QAAgent",
-    "ArchAgent",
+    "SWEAgent",
     "SecurityAgent",
 ]

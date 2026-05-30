@@ -14,7 +14,8 @@ JIRA = Skill(
 - `python jira_client.py get <KEY>` — full ticket (summary, description, AC, labels, linked repo)
 - `python jira_client.py search <jql>` — JQL search
 - `python jira_client.py comment <KEY> <text>` — post comment
-- `python jira_client.py transition <KEY> <status>` — move status (e.g. "In Progress", "In Review", "Done")
+- `python jira_client.py transition <KEY> <status>`
+  — move status: "In Progress", "In Review", "Done"
 
 Always prefix commands: `cd {_AGENT_DIR} && python jira_client.py ...`
 """,

@@ -30,7 +30,7 @@ jobs:
             uv-
 
       - name: Install dependencies
-        run: uv sync --no-extra agent
+        run: uv sync --no-extra agent --group dev
 
       - name: Lint with ruff
         run: uv run ruff check .
