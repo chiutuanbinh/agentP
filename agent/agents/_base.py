@@ -68,7 +68,9 @@ class BaseAgent(ABC):
         try:
             from langfuse import Langfuse
 
-            if os.environ.get("LANGFUSE_PUBLIC_KEY") and os.environ.get("LANGFUSE_SECRET_KEY"):
+            if os.environ.get("LANGFUSE_PUBLIC_KEY") and os.environ.get(
+                "LANGFUSE_SECRET_KEY"
+            ):
                 return Langfuse()
         except ImportError:
             pass
@@ -113,15 +115,20 @@ class BaseAgent(ABC):
         )
 
         try:
-            with (trace_ctx or cls._nullctx()):
+            with trace_ctx or cls._nullctx():
                 tool_obs: dict[str, object] = {}
 
                 try:
                     async for message in query(prompt=prompt, options=options):
-                        if isinstance(message, SystemMessage) and message.subtype == "init":
+                        if (
+                            isinstance(message, SystemMessage)
+                            and message.subtype == "init"
+                        ):
                             session_id = message.data.get("session_id")
                             if lf:
-                                lf.update_current_span(metadata={"session_id": session_id})
+                                lf.update_current_span(
+                                    metadata={"session_id": session_id}
+                                )
                             if verbose:
                                 print(f"[session] {session_id}")
 
@@ -132,7 +139,9 @@ class BaseAgent(ABC):
                                         print(block.text, end="", flush=True)
                                 elif isinstance(block, ToolUseBlock):
                                     if verbose:
-                                        print(f"\n[tool] {block.name}({_summarise(block.input)})")
+                                        print(
+                                            f"\n[tool] {block.name}({_summarise(block.input)})"
+                                        )
                                     if lf:
                                         obs = lf.start_observation(
                                             name=f"tool:{block.name}",
@@ -143,7 +152,9 @@ class BaseAgent(ABC):
 
                         elif isinstance(message, ResultMessage):
                             result_text = message.result or ""
-                            status = "error" if message.subtype == "error" else "success"
+                            status = (
+                                "error" if message.subtype == "error" else "success"
+                            )
                             if message.subtype == "error" and verbose:
                                 print(f"[error] {result_text}", flush=True)
                             if lf:
@@ -153,7 +164,10 @@ class BaseAgent(ABC):
                                 usage = getattr(message, "usage", None) or {}
                                 lf.set_current_trace_io(
                                     input={"prompt": prompt[:200], **trace_meta},
-                                    output={"result": result_text[:500], "status": status},
+                                    output={
+                                        "result": result_text[:500],
+                                        "status": status,
+                                    },
                                 )
                                 lf.update_current_span(
                                     metadata={
@@ -166,7 +180,9 @@ class BaseAgent(ABC):
 
                 except Exception as exc:
                     if lf:
-                        lf.update_current_span(metadata={"error": str(exc), "status": "exception"})
+                        lf.update_current_span(
+                            metadata={"error": str(exc), "status": "exception"}
+                        )
                     raise
 
         finally:

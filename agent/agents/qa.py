@@ -9,7 +9,9 @@ class QAAgent(BaseAgent):
     SKILLS = [JIRA, GITHUB, TESTING]
 
 
-async def run(ticket_key: str, pr_number: int | None = None, verbose: bool = False) -> str:
+async def run(
+    ticket_key: str, pr_number: int | None = None, verbose: bool = False
+) -> str:
     prompt = f"QA review for Jira ticket {ticket_key}."
     if pr_number:
         prompt += f" PR number: {pr_number}. Review the PR against the ticket's acceptance criteria."

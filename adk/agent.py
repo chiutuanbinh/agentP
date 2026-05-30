@@ -1,5 +1,4 @@
 from google.adk.agents import Agent
-from google.adk.tools import google_search
 
 
 def get_weather(city: str) -> dict:
@@ -12,7 +11,11 @@ def get_weather(city: str) -> dict:
     key = city.lower()
     if key in weather_data:
         data = weather_data[key]
-        return {"city": city, "temperature_celsius": data["temp_c"], "condition": data["condition"]}
+        return {
+            "city": city,
+            "temperature_celsius": data["temp_c"],
+            "condition": data["condition"],
+        }
     return {"city": city, "error": "Weather data not available"}
 
 

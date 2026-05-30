@@ -7,8 +7,9 @@ def calculate_average(numbers):
 
     return total / len(numbers)
 
+
 def get_user_name(user):
-    name = user.get('name')
+    name = user.get("name")
     if not name:
-        return ''
+        return ""
     return name.upper()

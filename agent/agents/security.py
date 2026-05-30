@@ -22,7 +22,9 @@ async def run(
         parts.append(f"PR #{pr_number}: fetch the diff and audit all changed files.")
     if repo:
         parts.append(f"Repository: {repo}. Audit the full codebase.")
-    parts.append("Report all findings with severity, location, and remediation. Create Jira tickets for high/critical.")
+    parts.append(
+        "Report all findings with severity, location, and remediation. Create Jira tickets for high/critical."
+    )
     prompt = " ".join(parts)
     return await SecurityAgent.run(
         prompt, verbose=verbose, ticket=ticket_key, pr=pr_number, repo=repo

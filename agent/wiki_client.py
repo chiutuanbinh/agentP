@@ -79,17 +79,21 @@ def get_page_by_title(space: str, title: str) -> dict:
 def _html_to_text(html: str) -> str:
     try:
         from bs4 import BeautifulSoup
+
         soup = BeautifulSoup(html, "html.parser")
         for tag in soup(["script", "style"]):
             tag.decompose()
         return soup.get_text(separator="\n", strip=True)
     except ImportError:
         import re
+
         return re.sub(r"<[^>]+>", "", html)
 
 
 COMMANDS = {
-    "search": lambda args: search(args[0], args[1] if len(args) > 1 else "", int(args[2]) if len(args) > 2 else 10),
+    "search": lambda args: search(
+        args[0], args[1] if len(args) > 1 else "", int(args[2]) if len(args) > 2 else 10
+    ),
     "get": lambda args: get_page(args[0]),
     "get-by-title": lambda args: get_page_by_title(args[0], args[1]),
 }
@@ -97,7 +101,9 @@ COMMANDS = {
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: wiki_client.py <command> [args...]")
-        print("Commands: search <query> [space] [max] | get <page_id> | get-by-title <space> <title>")
+        print(
+            "Commands: search <query> [space] [max] | get <page_id> | get-by-title <space> <title>"
+        )
         sys.exit(1)
     cmd = sys.argv[1]
     handler = COMMANDS.get(cmd)

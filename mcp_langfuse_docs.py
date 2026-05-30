@@ -39,7 +39,11 @@ def _fetch_text(url: str) -> str:
     for tag in soup(["nav", "header", "footer", "script", "style"]):
         tag.decompose()
     main = soup.find("main") or soup.find("article") or soup.body
-    return main.get_text(separator="\n", strip=True) if main else soup.get_text(separator="\n", strip=True)
+    return (
+        main.get_text(separator="\n", strip=True)
+        if main
+        else soup.get_text(separator="\n", strip=True)
+    )
 
 
 @mcp.tool()
@@ -93,7 +97,9 @@ def get_langfuse_openapi_spec() -> dict:
         for url in candidates:
             try:
                 resp = client.get(url)
-                if resp.status_code == 200 and "application/json" in resp.headers.get("content-type", ""):
+                if resp.status_code == 200 and "application/json" in resp.headers.get(
+                    "content-type", ""
+                ):
                     return resp.json()
             except Exception:
                 continue
