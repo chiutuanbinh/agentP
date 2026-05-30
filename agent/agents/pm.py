@@ -1,12 +1,14 @@
 """PM agent — ticket management, spec writing, epic decomposition."""
 
+from typing import ClassVar
+
 from ..skills import CONFLUENCE, JIRA
 from ._base import BaseAgent
 
 
 class PMAgent(BaseAgent):
     AGENT_NAME = "pm"
-    SKILLS = [JIRA, CONFLUENCE]
+    SKILLS: ClassVar[list] = [JIRA, CONFLUENCE]
 
 
 async def run(ticket_key: str, task: str = "review", verbose: bool = False) -> str:

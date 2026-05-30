@@ -70,9 +70,7 @@ def add_comment(key: str, body: str) -> None:
         "body": {
             "type": "doc",
             "version": 1,
-            "content": [
-                {"type": "paragraph", "content": [{"type": "text", "text": body}]}
-            ],
+            "content": [{"type": "paragraph", "content": [{"type": "text", "text": body}]}],
         }
     }
     r = requests.post(url, auth=_auth(), json=payload, timeout=15)
@@ -84,17 +82,11 @@ def transition_ticket(key: str, status_name: str) -> None:
     r = requests.get(url, auth=_auth(), timeout=15)
     r.raise_for_status()
     transitions = r.json().get("transitions", [])
-    match = next(
-        (t for t in transitions if status_name.lower() in t["name"].lower()), None
-    )
+    match = next((t for t in transitions if status_name.lower() in t["name"].lower()), None)
     if not match:
         available = [t["name"] for t in transitions]
-        raise ValueError(
-            f"Transition '{status_name}' not found. Available: {available}"
-        )
-    r2 = requests.post(
-        url, auth=_auth(), json={"transition": {"id": match["id"]}}, timeout=15
-    )
+        raise ValueError(f"Transition '{status_name}' not found. Available: {available}")
+    r2 = requests.post(url, auth=_auth(), json={"transition": {"id": match["id"]}}, timeout=15)
     r2.raise_for_status()
 
 
@@ -106,8 +98,7 @@ def _adf_to_text(node: dict | None) -> str:
     parts = [_adf_to_text(child) for child in node.get("content", [])]
     separator = (
         "\n"
-        if node.get("type")
-        in ("paragraph", "heading", "listItem", "bulletList", "orderedList")
+        if node.get("type") in ("paragraph", "heading", "listItem", "bulletList", "orderedList")
         else ""
     )
     return separator.join(filter(None, parts))
@@ -117,20 +108,14 @@ def _get_custom_field(fields: dict, name: str) -> str:
     for key, val in fields.items():
         if isinstance(val, dict) and val.get("name") == name:
             return str(val.get("value", ""))
-        if (
-            key.startswith("customfield_")
-            and isinstance(val, str)
-            and name.lower() in key.lower()
-        ):
+        if key.startswith("customfield_") and isinstance(val, str) and name.lower() in key.lower():
             return val
     return ""
 
 
 COMMANDS = {
     "get": lambda args: get_ticket(args[0]),
-    "search": lambda args: search_tickets(
-        args[0], int(args[1]) if len(args) > 1 else 20
-    ),
+    "search": lambda args: search_tickets(args[0], int(args[1]) if len(args) > 1 else 20),
     "comment": lambda args: (add_comment(args[0], args[1]), "ok")[1],
     "transition": lambda args: (transition_ticket(args[0], args[1]), "ok")[1],
 }
@@ -139,7 +124,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: jira_client.py <command> [args...]")
         print(
-            "Commands: get <KEY> | search <JQL> [max] | comment <KEY> <text> | transition <KEY> <status>"
+            "Commands: get <KEY> | search <JQL> [max] | comment <KEY> <text> | transition <KEY> <status>"  # noqa: E501
         )
         sys.exit(1)
     cmd = sys.argv[1]

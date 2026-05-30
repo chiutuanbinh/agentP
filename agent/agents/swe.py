@@ -1,12 +1,14 @@
 """SWE agent — ticket-to-PR workflow."""
 
+from typing import ClassVar
+
 from ..skills import CODE_TOOLS, CONFLUENCE, GITHUB, JIRA
-from ._base import BaseAgent, WORKSPACE
+from ._base import WORKSPACE, BaseAgent
 
 
 class SWEAgent(BaseAgent):
     AGENT_NAME = "swe"
-    SKILLS = [JIRA, GITHUB, CONFLUENCE, CODE_TOOLS]
+    SKILLS: ClassVar[list] = [JIRA, GITHUB, CONFLUENCE, CODE_TOOLS]
 
     @classmethod
     def _base_prompt(cls) -> str:
@@ -15,9 +17,7 @@ class SWEAgent(BaseAgent):
         return raw.replace("{WORKSPACE}", str(WORKSPACE))
 
 
-async def run(
-    ticket_key: str, repo_path: str | None = None, verbose: bool = False
-) -> str:
+async def run(ticket_key: str, repo_path: str | None = None, verbose: bool = False) -> str:
     prompt = f"Implement Jira ticket {ticket_key}."
     if repo_path:
         prompt += f" The repository is already checked out at {repo_path}."

@@ -43,14 +43,10 @@ def main() -> None:
         choices=["swe", "pm", "qa", "arch", "security"],
         help="Agent type (default: swe)",
     )
-    parser.add_argument(
-        "--repo", help="Repo path (swe: existing checkout; security: owner/repo)"
-    )
+    parser.add_argument("--repo", help="Repo path (swe: existing checkout; security: owner/repo)")
     parser.add_argument("--pr", type=int, help="PR number (qa, arch, security)")
     parser.add_argument("--task", help="Task description (pm agent)")
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Stream agent output"
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Stream agent output")
     args = parser.parse_args()
 
     try:
