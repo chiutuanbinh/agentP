@@ -17,8 +17,11 @@ Each agent is composed from **Skills** — pluggable units of tools + prompt gui
 ## Usage
 
 ```bash
-# Install deps
-uv sync
+# Install deps (includes dev tools)
+uv sync --group dev
+
+# Install pre-commit hooks (run once after clone)
+uv run pre-commit install
 
 # Run SWE agent against a Jira ticket
 uv run python agent/run.py ENG-123 --verbose

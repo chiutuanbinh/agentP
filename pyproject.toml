@@ -17,3 +17,8 @@ dependencies = [
 agent = [
     "langfuse>=4.7.1",
 ]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.6.0",
+]
