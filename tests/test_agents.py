@@ -7,6 +7,10 @@ from pathlib import Path
 # Make agent/ importable as a package
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent.parent / ".env")
+
 from agent.agents.agent_builder import AgentBuilderAgent
 from agent.agents.arch import ArchAgent
 from agent.agents.pm import PMAgent

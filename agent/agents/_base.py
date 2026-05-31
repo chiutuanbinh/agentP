@@ -4,7 +4,9 @@ Subclasses declare AGENT_NAME, SKILLS, and optionally BACKEND.
 BaseAgent handles prompt assembly, Langfuse trace wrapping, and backend dispatch.
 """
 
+import json
 import os
+import urllib.request
 from abc import ABC
 from contextlib import contextmanager
 from pathlib import Path
@@ -119,8 +121,30 @@ class BaseAgent(ABC):  # noqa: B024
                     trace_meta=trace_meta,
                     mcp_servers=cls.MCP_SERVERS,
                 )
+        except Exception as exc:
+            cls._telegram_notify(f"*{cls.AGENT_NAME}* failed\n`{exc}`")
+            raise
         finally:
             if lf:
                 lf.flush()
 
+        cls._telegram_notify(f"*{cls.AGENT_NAME}* done\n{result.text[:300]}")
         return result.text
+
+    @classmethod
+    def _telegram_notify(cls, text: str) -> None:
+        token = os.environ.get("TELEGRAM_BOT_TOKEN")
+        chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+        if not token or not chat_id:
+            return
+        try:
+            body = {"chat_id": chat_id, "text": text, "parse_mode": "Markdown"}
+            payload = json.dumps(body).encode()
+            req = urllib.request.Request(
+                f"https://api.telegram.org/bot{token}/sendMessage",
+                data=payload,
+                headers={"Content-Type": "application/json"},
+            )
+            urllib.request.urlopen(req, timeout=5)  # noqa: S310
+        except Exception:  # noqa: S110
+            pass  # never block agent on notification failure
