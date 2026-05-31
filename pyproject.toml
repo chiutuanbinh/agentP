@@ -54,4 +54,4 @@ ignore = [
 "scripts/*.py" = ["T20"]
 "claude/*.py" = ["T20"]
 "agent/run.py" = ["T20"]
-"tests/test_agents.py" = ["T20", "E402"]
+"tests/test_agents.py" = ["E402"]

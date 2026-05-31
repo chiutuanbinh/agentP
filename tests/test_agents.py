@@ -1,6 +1,7 @@
 """Quick harness to test agent/ agents without the full run.py CLI."""
 
 import asyncio
+import logging
 import sys
 from pathlib import Path
 
@@ -18,6 +19,9 @@ from agent.agents.qa import QAAgent
 from agent.agents.security import SecurityAgent
 from agent.agents.swe import SWEAgent
 
+logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+log = logging.getLogger(__name__)
+
 AGENTS = {
     "swe": SWEAgent,
     "pm": PMAgent,
@@ -34,17 +38,16 @@ async def main():
 
     agent_cls = AGENTS.get(agent_name)
     if agent_cls is None:
-        print(f"Unknown agent '{agent_name}'. Choose from: {', '.join(AGENTS)}")
+        log.error("Unknown agent '%s'. Choose from: %s", agent_name, ", ".join(AGENTS))
         sys.exit(1)
 
     if prompt is None:
-        print(f"=== {agent_name} system prompt ===\n")
-        print(agent_cls.system_prompt())
-        print(f"\n=== allowed tools ===\n{agent_cls.allowed_tools()}")
+        log.info("=== %s system prompt ===\n%s", agent_name, agent_cls.system_prompt())
+        log.info("=== allowed tools ===\n%s", agent_cls.allowed_tools())
         return
 
     result = await agent_cls.run(prompt, verbose=True)
-    print(f"\n=== result ===\n{result}")
+    log.info("=== result ===\n%s", result)
 
 
 asyncio.run(main())
