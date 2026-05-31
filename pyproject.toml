@@ -50,4 +50,6 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "agent/jira_client.py" = ["T20"]   # CLI scripts may use print for output
 "agent/wiki_client.py" = ["T20"]
+"scripts/*.py" = ["T20"]
+"claude/*.py" = ["T20"]
 "agent/run.py" = ["T20"]
