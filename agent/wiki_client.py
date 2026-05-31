@@ -90,12 +90,52 @@ def _html_to_text(html: str) -> str:
         return re.sub(r"<[^>]+>", "", html)
 
 
+def create_page(space: str, title: str, body: str, parent_id: str = "") -> dict:
+    url = f"{_base()}/rest/api/content"
+    payload: dict = {
+        "type": "page",
+        "title": title,
+        "space": {"key": space},
+        "body": {"storage": {"value": body, "representation": "storage"}},
+    }
+    if parent_id:
+        payload["ancestors"] = [{"id": parent_id}]
+    r = requests.post(url, auth=_auth(), json=payload, timeout=20)
+    r.raise_for_status()
+    data = r.json()
+    return {
+        "id": data["id"],
+        "title": data["title"],
+        "url": f"{_base()}/wiki{data['_links']['webui']}",
+    }
+
+
+def update_page(page_id: str, title: str, body: str, version: int) -> dict:
+    url = f"{_base()}/rest/api/content/{page_id}"
+    payload = {
+        "type": "page",
+        "title": title,
+        "version": {"number": version},
+        "body": {"storage": {"value": body, "representation": "storage"}},
+    }
+    r = requests.put(url, auth=_auth(), json=payload, timeout=20)
+    r.raise_for_status()
+    data = r.json()
+    return {
+        "id": data["id"],
+        "title": data["title"],
+        "url": f"{_base()}/wiki{data['_links']['webui']}",
+    }
+
+
 COMMANDS = {
     "search": lambda args: search(
         args[0], args[1] if len(args) > 1 else "", int(args[2]) if len(args) > 2 else 10
     ),
     "get": lambda args: get_page(args[0]),
     "get-by-title": lambda args: get_page_by_title(args[0], args[1]),
+    "create": lambda args: create_page(args[0], args[1], args[2], args[3] if len(args) > 3 else ""),
+    "update": lambda args: update_page(args[0], args[1], args[2], int(args[3])),
 }
 
 if __name__ == "__main__":
@@ -103,6 +143,8 @@ if __name__ == "__main__":
         print("Usage: wiki_client.py <command> [args...]")
         print(
             "Commands: search <query> [space] [max] | get <page_id> | get-by-title <space> <title>"
+            " | create <space> <title> <body_html> [parent_id]"
+            " | update <page_id> <title> <body_html> <version>"
         )
         sys.exit(1)
     cmd = sys.argv[1]

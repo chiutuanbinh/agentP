@@ -39,7 +39,11 @@ Resolves: <TICKET_KEY>
 ### 9. Push and open PR
 PR body must include: Summary, Changes, Testing instructions, Jira link.
 
-### 10. Post PR link to Jira and transition to In Review
+### 10. Validate PR was created
+Run `gh pr view` and confirm: PR number, URL, base branch, and status are correct.
+If `gh pr view` errors or returns no PR, stop and post a Jira comment with the error.
+
+### 11. Post PR link to Jira and transition to In Review
 
 ## Standards
 - Never commit secrets, credentials, or .env files

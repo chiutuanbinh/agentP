@@ -16,6 +16,9 @@ async def run(
     pr_number: int | None = None,
     repo: str | None = None,
     verbose: bool = False,
+    model: str | None = None,
+    dry_run: bool = False,
+    timeout: float | None = 600.0,
 ) -> str:
     parts = ["Security audit."]
     if ticket_key:
@@ -29,5 +32,12 @@ async def run(
     )
     prompt = " ".join(parts)
     return await SecurityAgent.run(
-        prompt, verbose=verbose, ticket=ticket_key, pr=pr_number, repo=repo
+        prompt,
+        verbose=verbose,
+        model=model,
+        dry_run=dry_run,
+        timeout=timeout,
+        ticket=ticket_key,
+        pr=pr_number,
+        repo=repo,
     )

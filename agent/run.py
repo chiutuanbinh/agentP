@@ -47,6 +47,13 @@ def main() -> None:
     parser.add_argument("--pr", type=int, help="PR number (qa, arch, security)")
     parser.add_argument("--task", help="Task description (pm agent)")
     parser.add_argument("--verbose", "-v", action="store_true", help="Stream agent output")
+    parser.add_argument("--model", help="Model override (e.g. claude-opus-4-8)")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Print assembled prompt without executing"
+    )
+    parser.add_argument(
+        "--timeout", type=float, default=600.0, help="Timeout in seconds (default: 600)"
+    )
     args = parser.parse_args()
 
     try:
@@ -63,8 +70,9 @@ def main() -> None:
         sys.exit(1)
 
     result = asyncio.run(_dispatch(args))
-    print("\n" + "=" * 60)
-    print(result)
+    if not args.dry_run:
+        print("\n" + "=" * 60)
+        print(result)
 
 
 async def _dispatch(args) -> str:
@@ -77,7 +85,14 @@ async def _dispatch(args) -> str:
             print("swe agent requires a ticket key", file=sys.stderr)
             sys.exit(1)
         print(f"Starting SWE agent for {args.ticket}...")
-        return await run(args.ticket, repo_path=args.repo, verbose=args.verbose)
+        return await run(
+            args.ticket,
+            repo_path=args.repo,
+            verbose=args.verbose,
+            model=args.model,
+            dry_run=args.dry_run,
+            timeout=args.timeout,
+        )
 
     if agent == "pm":
         from agent.agents.pm import run
@@ -87,7 +102,14 @@ async def _dispatch(args) -> str:
             sys.exit(1)
         task = args.task or "review and refine the ticket"
         print(f"Starting PM agent for {args.ticket} — {task}...")
-        return await run(args.ticket, task=task, verbose=args.verbose)
+        return await run(
+            args.ticket,
+            task=task,
+            verbose=args.verbose,
+            model=args.model,
+            dry_run=args.dry_run,
+            timeout=args.timeout,
+        )
 
     if agent == "qa":
         from agent.agents.qa import run
@@ -96,7 +118,14 @@ async def _dispatch(args) -> str:
             print("qa agent requires a ticket key", file=sys.stderr)
             sys.exit(1)
         print(f"Starting QA agent for {args.ticket}...")
-        return await run(args.ticket, pr_number=args.pr, verbose=args.verbose)
+        return await run(
+            args.ticket,
+            pr_number=args.pr,
+            verbose=args.verbose,
+            model=args.model,
+            dry_run=args.dry_run,
+            timeout=args.timeout,
+        )
 
     if agent == "arch":
         from agent.agents.arch import run
@@ -105,7 +134,14 @@ async def _dispatch(args) -> str:
             print("arch agent requires a ticket key", file=sys.stderr)
             sys.exit(1)
         print(f"Starting Architecture agent for {args.ticket}...")
-        return await run(args.ticket, pr_number=args.pr, verbose=args.verbose)
+        return await run(
+            args.ticket,
+            pr_number=args.pr,
+            verbose=args.verbose,
+            model=args.model,
+            dry_run=args.dry_run,
+            timeout=args.timeout,
+        )
 
     if agent == "security":
         from agent.agents.security import run
@@ -116,6 +152,9 @@ async def _dispatch(args) -> str:
             pr_number=args.pr,
             repo=args.repo,
             verbose=args.verbose,
+            model=args.model,
+            dry_run=args.dry_run,
+            timeout=args.timeout,
         )
 
     if agent == "agent_builder":
@@ -125,7 +164,13 @@ async def _dispatch(args) -> str:
             print("agent_builder requires --task", file=sys.stderr)
             sys.exit(1)
         print(f"Starting Agent Builder — {args.task}...")
-        return await run(args.task, verbose=args.verbose)
+        return await run(
+            args.task,
+            verbose=args.verbose,
+            model=args.model,
+            dry_run=args.dry_run,
+            timeout=args.timeout,
+        )
 
     print(f"Unknown agent: {agent}", file=sys.stderr)
     sys.exit(1)

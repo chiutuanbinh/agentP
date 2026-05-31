@@ -50,12 +50,14 @@ Three agent experiments side-by-side:
 - `agent_sdk.py` — Claude Agent SDK `query()`, spins up Claude Code subprocess with `Read`/`Edit`/`Glob` tools in `acceptEdits` mode
 - `buggy.py` — sample target for `agent_sdk.py` bug-review experiments
 
-**`agent/`** — Production SWE agent: ticket → PR workflow using Claude Agent SDK.
-- `run.py` — CLI entry; validates env, loads `.env`, calls `swe_agent.run()`
-- `swe_agent.py` — core: `query()` with a detailed SWE system prompt; Langfuse v4 tracing (graceful no-op if keys absent); `WORKSPACE` env var sets repo checkout dir (defaults to `~/workspace`)
+**`agent/`** — Multi-agent system: ticket → PR workflow using Claude Agent SDK.
+- `run.py` — CLI entry; validates env, loads `.env`, dispatches to agent type (`--agent swe|pm|qa|arch|security|agent_builder`)
+- `agents/_base.py` — `BaseAgent`: template method for prompt assembly, tool union, Langfuse tracing, SDK query loop with timeout
+- `agents/{swe,pm,qa,arch,security,agent_builder}.py` — one class + `run()` per agent type
+- `skills/{jira,github,confluence,code_tools,testing,security_audit,agent_builder_docs}.py` — composable skill units (tools + prompt section)
+- `prompts/{swe,pm,qa,arch,security,agent_builder}.md` — system prompts, one per agent
 - `jira_client.py` — Jira REST API CLI; agent invokes via `Bash`: `python jira_client.py get|search|comment|transition <args>`
 - `wiki_client.py` — Confluence REST API CLI; agent invokes via `Bash`: `python wiki_client.py search|get|get-by-title <args>`
-- Agent uses only built-in SDK tools (`Read`, `Write`, `Edit`, `Bash`, `Glob`, `Grep`); external systems (Jira, GitHub via `gh` CLI, Confluence) accessed through `Bash` subprocess calls to the helper scripts
 
 **`mcp_claude_docs.py`** — MCP server for Claude Agent SDK docs (registered in `.mcp.json` as `claude-sdk-docs`).
 
@@ -81,6 +83,7 @@ CONFLUENCE_URL        # falls back to JIRA_URL if unset
 CONFLUENCE_USER       # falls back to JIRA_USER
 CONFLUENCE_API_TOKEN  # falls back to JIRA_API_TOKEN
 WORKSPACE             # repo checkout root; defaults to ~/workspace
+SLACK_WEBHOOK_URL     # enables Slack notifications (incoming webhook URL)
 ```
 
 ## Hooks

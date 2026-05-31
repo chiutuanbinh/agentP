@@ -18,5 +18,6 @@ JIRA = Skill(
   — move status: "In Progress", "In Review", "Done"
 
 Always prefix commands: `cd {_AGENT_DIR} && python jira_client.py ...`
+If a command exits non-zero: stop, post a Jira comment with the error, do not proceed.
 """,
 )
