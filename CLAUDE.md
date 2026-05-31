@@ -47,7 +47,7 @@ docker run --rm \
 - `run.py` — CLI entry; validates env, loads `.env`, dispatches to agent type (`--agent agent_builder|arch|pm|qa|security|swe`)
 - `agents/_base.py` — `BaseAgent`: template method for prompt assembly, tool union, Langfuse tracing, backend dispatch
 - `agents/{...}.py` — one class + `run()` per agent type (see below)
-- `backends/{...}.py` — LLMBackend strategy layer: `claude`, `copilot`
+- `backends/{...}.py` — LLMBackend strategy layer: `adk`, `claude`, `copilot`
 - `skills/{...}.py` — composable skill units (tools + prompt section)
 - `prompts/{...}.md` — system prompts, one per agent
 - `jira_client.py` — Jira REST API CLI; agent invokes via `Bash`: `python jira_client.py get|search|comment|transition <args>`
@@ -62,6 +62,7 @@ docker run --rm \
 - `swe.py` (`swe`) — SWE agent — ticket-to-PR workflow
 
 **Backends** (`agent/backends/`) — LLMBackend strategy:
+- `adk.py` (`name="adk"`) — ADK backend — runs agents via Google ADK (Gemini models)
 - `claude.py` (`name="claude"`) — Claude backend — runs agents via Claude Agent SDK (claude-code subprocess)
 - `copilot.py` (`name="copilot"`) — Copilot backend — runs agents via GitHub Copilot SDK
 
