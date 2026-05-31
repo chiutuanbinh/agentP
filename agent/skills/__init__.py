@@ -10,6 +10,7 @@ from .jira import JIRA
 from .langfuse import LANGFUSE_SKILL
 from .security_audit import SECURITY_AUDIT
 from .slack import SLACK
+from .telegram import TELEGRAM
 from .testing import TESTING
 
 __all__ = [
@@ -22,6 +23,7 @@ __all__ = [
     "LANGFUSE_SKILL",
     "SECURITY_AUDIT",
     "SLACK",
+    "TELEGRAM",
     "TESTING",
     "Skill",
 ]

@@ -76,6 +76,7 @@ docker run --rm \
 - `langfuse.py` (`langfuse`) — Langfuse skill — query traces and observations at runtime
 - `security_audit.py` (`security_audit`) — Security audit skill — vulnerability review and audit guidance
 - `slack.py` (`slack`) — Slack skill — post notifications via webhook or CLI
+- `telegram.py` (`telegram`) — Telegram skill — send notifications via Telegram Bot API
 - `testing.py` (`testing`) — Testing skill — test writing, coverage, and QA guidance
 
 **MCP servers** (root):
