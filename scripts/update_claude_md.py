@@ -115,20 +115,29 @@ def _skill_name(path: Path) -> str | None:
 def build_architecture_section() -> str:
     lines: list[str] = ["## Architecture", ""]
 
-    # ── Static: three main experiments ──────────────────────────────────────
-    lines += [
-        "Three agent experiments side-by-side:",
-        "",
-        "**`adk/`** — Google ADK agent (`google-adk`). Entry: `root_agent` in `adk/agent.py`."
-        " Run via `adk web`. Session state in `adk/.adk/session.db` (gitignored).",
-        "",
-        "**`claude/`** — Anthropic Claude experiments:",
-        "- `llm_api.py` — direct Messages API (`anthropic` SDK)",
-        "- `agent_sdk.py` — Claude Agent SDK `query()`, spins up Claude Code subprocess"
-        " with `Read`/`Edit`/`Glob` tools in `acceptEdits` mode",
-        "- `buggy.py` — sample target for `agent_sdk.py` bug-review experiments",
-        "",
-    ]
+    # ── Dynamic: top-level experiment directories ────────────────────────────
+    top_level_dirs = [d for d in ["adk", "claude", "agent"] if (REPO / d).is_dir()]
+    n = len(top_level_dirs)
+    lines.append(f"{n} experiment director{'y' if n == 1 else 'ies'}:")
+    lines.append("")
+
+    if (REPO / "adk").is_dir():
+        lines += [
+            "**`adk/`** — Google ADK agent (`google-adk`). Entry: `root_agent` in `adk/agent.py`."
+            " Run via `adk web`. Session state in `adk/.adk/session.db` (gitignored).",
+            "",
+        ]
+
+    if (REPO / "claude").is_dir():
+        claude_files = sorted((REPO / "claude").glob("*.py"))
+        lines.append("**`claude/`** — Anthropic Claude experiments:")
+        for f in claude_files:
+            doc = _module_docstring(f)
+            entry = f"- `{f.name}`"
+            if doc:
+                entry += f" — {doc}"
+            lines.append(entry)
+        lines.append("")
 
     # ── agent/ system ────────────────────────────────────────────────────────
     lines += [

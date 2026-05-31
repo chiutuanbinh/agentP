@@ -41,14 +41,7 @@ docker run --rm \
 
 ## Architecture
 
-Three agent experiments side-by-side:
-
-**`adk/`** — Google ADK agent (`google-adk`). Entry: `root_agent` in `adk/agent.py`. Run via `adk web`. Session state in `adk/.adk/session.db` (gitignored).
-
-**`claude/`** — Anthropic Claude experiments:
-- `llm_api.py` — direct Messages API (`anthropic` SDK)
-- `agent_sdk.py` — Claude Agent SDK `query()`, spins up Claude Code subprocess with `Read`/`Edit`/`Glob` tools in `acceptEdits` mode
-- `buggy.py` — sample target for `agent_sdk.py` bug-review experiments
+1 experiment directory:
 
 **`agent/`** — Multi-agent system: ticket → PR workflow using Claude Agent SDK.
 - `run.py` — CLI entry; validates env, loads `.env`, dispatches to agent type (`--agent agent_builder|arch|pm|qa|security|swe`)
