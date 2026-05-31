@@ -14,5 +14,7 @@ GITHUB = Skill(
 - `gh issue view <number>` — view issue
 - `gh issue list --repo <owner/repo>` — list issues
 - `gh api repos/<owner>/<repo>/pulls/<number>/reviews` — fetch PR reviews
+
+If any `gh` command exits non-zero: stop, report the exact error, do not proceed.
 """,
 )

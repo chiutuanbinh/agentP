@@ -11,6 +11,21 @@ class PMAgent(BaseAgent):
     SKILLS: ClassVar[list] = [JIRA, CONFLUENCE]
 
 
-async def run(ticket_key: str, task: str = "review", verbose: bool = False) -> str:
-    prompt = f"You are working on Jira ticket {ticket_key}. Task: {task}. Follow the PM workflow."
-    return await PMAgent.run(prompt, verbose=verbose, ticket=ticket_key, task=task)
+async def run(
+    ticket_key: str,
+    task: str = "review",
+    verbose: bool = False,
+    model: str | None = None,
+    dry_run: bool = False,
+    timeout: float | None = 600.0,
+) -> str:
+    prompt = f"Ticket: {ticket_key}. Task: {task}."
+    return await PMAgent.run(
+        prompt,
+        verbose=verbose,
+        model=model,
+        dry_run=dry_run,
+        timeout=timeout,
+        ticket=ticket_key,
+        task=task,
+    )

@@ -7,6 +7,7 @@ Subclasses declare AGENT_NAME and SKILLS; BaseAgent handles:
   - Claude Agent SDK query loop + message streaming
 """
 
+import asyncio
 import os
 from abc import ABC
 from contextlib import contextmanager
@@ -89,13 +90,22 @@ class BaseAgent(ABC):  # noqa: B024
         cls,
         prompt: str,
         verbose: bool = False,
+        model: str | None = None,
+        timeout: float | None = 600.0,
+        dry_run: bool = False,
         **trace_meta,
     ) -> str:
+        if dry_run:
+            sys_p = cls.system_prompt()
+            print(f"[dry-run] system_prompt:\n{sys_p}\n\n[dry-run] user prompt:\n{prompt}")  # noqa: T201
+            return ""
+
         options = ClaudeAgentOptions(
             system_prompt=cls.system_prompt(),
             allowed_tools=cls.allowed_tools(),
             permission_mode="acceptEdits",
             cwd=str(WORKSPACE),
+            model=model,
         )
 
         lf = cls._make_langfuse()
@@ -117,7 +127,9 @@ class BaseAgent(ABC):  # noqa: B024
             with trace_ctx or cls._nullctx():
                 tool_obs: dict[str, object] = {}
 
-                try:
+                async def _run_query():
+                    nonlocal result_text, session_id
+
                     async for message in query(prompt=prompt, options=options):
                         if isinstance(message, SystemMessage) and message.subtype == "init":
                             session_id = message.data.get("session_id")
@@ -149,31 +161,49 @@ class BaseAgent(ABC):  # noqa: B024
                             status = "error" if message.subtype == "error" else "success"
                             if message.subtype == "error" and verbose:
                                 print(f"[error] {result_text}", flush=True)  # noqa: T201
+                            if verbose:
+                                usage = getattr(message, "usage", None) or {}
+                                inp = usage.get("input_tokens", "?")
+                                out = usage.get("output_tokens", "?")
+                                print(f"\n[tokens] input={inp} output={out}")  # noqa: T201
                             if lf:
                                 for obs in tool_obs.values():
                                     obs.update(output={"status": "completed"}).end()
                                 tool_obs.clear()
                                 usage = getattr(message, "usage", None) or {}
-                                lf.set_current_trace_io(
-                                    input={"prompt": prompt[:200], **trace_meta},
-                                    output={
-                                        "result": result_text[:500],
-                                        "status": status,
-                                    },
-                                )
                                 lf.update_current_span(
+                                    input={"prompt": prompt[:200], **trace_meta},
+                                    output={"result": result_text[:500], "status": status},
                                     metadata={
                                         "session_id": session_id,
                                         "status": status,
                                         "input_tokens": usage.get("input_tokens"),
                                         "output_tokens": usage.get("output_tokens"),
-                                    }
+                                    },
                                 )
 
-                except Exception as exc:
-                    if lf:
-                        lf.update_current_span(metadata={"error": str(exc), "status": "exception"})
-                    raise
+                max_attempts = 3
+                for attempt in range(1, max_attempts + 1):
+                    try:
+                        await asyncio.wait_for(_run_query(), timeout=timeout)
+                        break
+                    except TimeoutError:
+                        if lf:
+                            lf.update_current_span(
+                                metadata={"error": "timeout", "status": "timeout"}
+                            )
+                        raise
+                    except Exception as exc:
+                        if attempt == max_attempts:
+                            if lf:
+                                lf.update_current_span(
+                                    metadata={"error": str(exc), "status": "exception"}
+                                )
+                            raise
+                        wait = 2**attempt
+                        if verbose:
+                            print(f"[retry {attempt}/{max_attempts - 1}] {exc} — retry in {wait}s")  # noqa: T201
+                        await asyncio.sleep(wait)
 
         finally:
             if lf:

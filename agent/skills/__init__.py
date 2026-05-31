@@ -6,7 +6,9 @@ from .code_tools import CODE_TOOLS
 from .confluence import CONFLUENCE
 from .github import GITHUB
 from .jira import JIRA
+from .langfuse import LANGFUSE_SKILL
 from .security_audit import SECURITY_AUDIT
+from .slack import SLACK
 from .testing import TESTING
 
 __all__ = [
@@ -15,7 +17,9 @@ __all__ = [
     "CONFLUENCE",
     "GITHUB",
     "JIRA",
+    "LANGFUSE_SKILL",
     "SECURITY_AUDIT",
+    "SLACK",
     "TESTING",
     "Skill",
 ]
