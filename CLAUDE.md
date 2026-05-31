@@ -44,7 +44,7 @@ docker run --rm \
 1 experiment directory:
 
 **`agent/`** — Multi-agent system: ticket → PR workflow using Claude Agent SDK.
-- `run.py` — CLI entry; validates env, loads `.env`, dispatches to agent type (`--agent agent_builder|arch|pm|qa|security|swe`)
+- `run.py` — CLI entry; validates env, loads `.env`, dispatches to agent type (`--agent agent_builder|arch|data_analyst|data_engineer|data_scientist|pm|qa|security|swe`)
 - `agents/_base.py` — `BaseAgent`: template method for prompt assembly, tool union, Langfuse tracing, backend dispatch
 - `agents/{...}.py` — one class + `run()` per agent type (see below)
 - `backends/{...}.py` — LLMBackend strategy layer: `adk`, `claude`, `copilot`
@@ -56,6 +56,9 @@ docker run --rm \
 **Agents** (`agent/agents/`):
 - `agent_builder.py` (`agent_builder`) — Agent builder — creates new agents using Claude Agent SDK and Langfuse docs
 - `arch.py` (`arch`) — Architecture agent — design review, ADR writing, systemic code issues
+- `data_analyst.py` (`data_analyst`) — Data analyst agent — ticket-to-insight workflow for business analysis
+- `data_engineer.py` (`data_engineer`) — Data engineer agent — ticket-to-PR workflow for data pipelines
+- `data_scientist.py` (`data_scientist`) — Data scientist agent — ticket-to-artifact workflow for ML and analysis
 - `pm.py` (`pm`) — PM agent — ticket management, spec writing, epic decomposition
 - `qa.py` (`qa`) — QA agent — test planning, PR review, bug reporting
 - `security.py` (`security`) — Security agent — vulnerability audit, findings, remediation tickets
@@ -68,12 +71,15 @@ docker run --rm \
 
 **Skills** (`agent/skills/`) — composable tool + prompt units:
 - `agent_builder_docs.py` (`agent_builder_docs`) — Agent builder docs skill — MCP tools for Claude Agent SDK and Langfuse docs
+- `azure_data.py` (`azure_data`) — Azure data stack skill — ADF, ADLS, Azure SQL, Synapse via az CLI
 - `code_tools.py` (`code_tools`) — Code tools skill — linting, formatting, git workflow guidance
 - `confluence.py` (`confluence`) — Confluence skill — wiki search and retrieval via wiki_client.py
 - `copilot.py` (`copilot`) — GitHub Copilot SDK skill — MCP tools for interacting with GitHub Copilot
+- `databricks.py` (`databricks`) — Databricks skill — jobs, clusters, DBFS, and Delta Lake via Databricks CLI
 - `github.py` (`github`) — GitHub skill — gh CLI interactions
 - `jira.py` (`jira`) — Jira skill — ticket CRUD via jira_client.py
 - `langfuse.py` (`langfuse`) — Langfuse skill — query traces and observations at runtime
+- `postgres.py` (`postgres`) — PostgreSQL skill — query, inspect, and manage Postgres databases via psql
 - `security_audit.py` (`security_audit`) — Security audit skill — vulnerability review and audit guidance
 - `slack.py` (`slack`) — Slack skill — post notifications via webhook or CLI
 - `telegram.py` (`telegram`) — Telegram skill — send notifications via Telegram Bot API

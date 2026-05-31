@@ -40,7 +40,7 @@ def main() -> None:
         "--agent",
         "-a",
         default="swe",
-        choices=["swe", "pm", "qa", "arch", "security", "agent_builder"],
+        choices=["swe", "pm", "qa", "arch", "security", "agent_builder", "data_engineer", "data_scientist", "data_analyst"],
         help="Agent type (default: swe)",
     )
     parser.add_argument("--repo", help="Repo path (swe: existing checkout; security: owner/repo)")
@@ -166,6 +166,54 @@ async def _dispatch(args) -> str:
         print(f"Starting Agent Builder — {args.task}...")
         return await run(
             args.task,
+            verbose=args.verbose,
+            model=args.model,
+            dry_run=args.dry_run,
+            timeout=args.timeout,
+        )
+
+    if agent == "data_engineer":
+        from agent.agents.data_engineer import run
+
+        if not args.ticket:
+            print("data_engineer agent requires a ticket key", file=sys.stderr)
+            sys.exit(1)
+        print(f"Starting Data Engineer agent for {args.ticket}...")
+        return await run(
+            args.ticket,
+            repo_path=args.repo,
+            verbose=args.verbose,
+            model=args.model,
+            dry_run=args.dry_run,
+            timeout=args.timeout,
+        )
+
+    if agent == "data_scientist":
+        from agent.agents.data_scientist import run
+
+        if not args.ticket:
+            print("data_scientist agent requires a ticket key", file=sys.stderr)
+            sys.exit(1)
+        print(f"Starting Data Scientist agent for {args.ticket}...")
+        return await run(
+            args.ticket,
+            task=args.task,
+            verbose=args.verbose,
+            model=args.model,
+            dry_run=args.dry_run,
+            timeout=args.timeout,
+        )
+
+    if agent == "data_analyst":
+        from agent.agents.data_analyst import run
+
+        if not args.ticket:
+            print("data_analyst agent requires a ticket key", file=sys.stderr)
+            sys.exit(1)
+        print(f"Starting Data Analyst agent for {args.ticket}...")
+        return await run(
+            args.ticket,
+            task=args.task,
             verbose=args.verbose,
             model=args.model,
             dry_run=args.dry_run,
