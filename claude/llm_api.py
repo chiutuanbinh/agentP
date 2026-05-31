@@ -7,4 +7,4 @@ message = client.messages.create(
     max_tokens=1000,
     messages=[{"role": "user", "content": "Write a haiku about the ocean."}],
 )
-print(message.content)  # noqa: T201
+print(message.content)
