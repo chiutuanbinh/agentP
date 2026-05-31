@@ -250,13 +250,18 @@ _ARCH_RE = re.compile(r"## Architecture\n.*?(?=\n## |\Z)", re.DOTALL)
 
 
 def patch_claude_md(current: str, new_section: str) -> str:
-    """Replace ## Architecture block, preserving everything else."""
+    """Replace ALL ## Architecture blocks with a single updated one."""
     new_block = new_section.rstrip("\n")
-    if _ARCH_RE.search(current):
-        result = _ARCH_RE.sub(new_block, current)
-    else:
-        result = current.rstrip("\n") + "\n\n" + new_block + "\n"
-    return result
+    if not _ARCH_RE.search(current):
+        return current.rstrip("\n") + "\n\n" + new_block + "\n"
+
+    count = [0]
+
+    def _replace_once(m: re.Match) -> str:
+        count[0] += 1
+        return new_block if count[0] == 1 else ""
+
+    return _ARCH_RE.sub(_replace_once, current)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
