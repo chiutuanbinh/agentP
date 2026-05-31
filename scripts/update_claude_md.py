@@ -51,7 +51,7 @@ def _agent_name(path: Path) -> str | None:
                         if isinstance(t, ast.Name) and t.id == "AGENT_NAME":
                             try:
                                 return ast.literal_eval(item.value)
-                            except (ValueError, TypeError):
+                            except ValueError, TypeError:
                                 pass
     return None
 
@@ -70,7 +70,7 @@ def _backend_name(path: Path) -> str | None:
                         if isinstance(t, ast.Name) and t.id == "name":
                             try:
                                 return ast.literal_eval(item.value)
-                            except (ValueError, TypeError):
+                            except ValueError, TypeError:
                                 pass
     return None
 
@@ -102,7 +102,7 @@ def _skill_name(path: Path) -> str | None:
                     if kw.arg == "name":
                         try:
                             return ast.literal_eval(kw.value)
-                        except (ValueError, TypeError):
+                        except ValueError, TypeError:
                             pass
     return None
 
@@ -179,7 +179,7 @@ def build_architecture_section() -> str:
         doc = _module_docstring(path)
         entry = f"- `{path.stem}.py`"
         if bname:
-            entry += f" (`name=\"{bname}\"`)"
+            entry += f' (`name="{bname}"`)'
         if doc:
             entry += f" — {doc}"
         lines.append(entry)
