@@ -33,6 +33,7 @@ WORKSPACE = Path(os.environ.get("WORKSPACE", os.path.expanduser("~/workspace")))
 class BaseAgent(ABC):  # noqa: B024
     AGENT_NAME: str = ""
     SKILLS: ClassVar[list[Skill]] = []
+    MCP_SERVERS: ClassVar[dict] = {}
 
     # ------------------------------------------------------------------
     # Prompt + tool assembly
@@ -106,6 +107,7 @@ class BaseAgent(ABC):  # noqa: B024
             permission_mode="acceptEdits",
             cwd=str(WORKSPACE),
             model=model,
+            mcp_servers=cls.MCP_SERVERS if cls.MCP_SERVERS else {},
         )
 
         lf = cls._make_langfuse()

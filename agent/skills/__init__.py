@@ -4,6 +4,7 @@ from ._base import Skill
 from .agent_builder_docs import AGENT_BUILDER_DOCS
 from .code_tools import CODE_TOOLS
 from .confluence import CONFLUENCE
+from .copilot import COPILOT_SKILL
 from .github import GITHUB
 from .jira import JIRA
 from .langfuse import LANGFUSE_SKILL
@@ -15,6 +16,7 @@ __all__ = [
     "AGENT_BUILDER_DOCS",
     "CODE_TOOLS",
     "CONFLUENCE",
+    "COPILOT_SKILL",
     "GITHUB",
     "JIRA",
     "LANGFUSE_SKILL",
