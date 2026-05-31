@@ -206,6 +206,24 @@ def _make_claude_messages(result_text="done", tool_names=(), error=False):
 
 
 class TestClaudeBackend:
+    # Patch isinstance-checked classes in the backend module so the dummy
+    # message objects are recognised regardless of real SDK import order.
+    _class_patches: ClassVar[list] = [
+        patch("agent.backends.claude.SystemMessage", _SystemMessage),
+        patch("agent.backends.claude.AssistantMessage", _AssistantMessage),
+        patch("agent.backends.claude.ResultMessage", _ResultMessage),
+        patch("agent.backends.claude.TextBlock", _TextBlock),
+        patch("agent.backends.claude.ToolUseBlock", _ToolUseBlock),
+    ]
+
+    def setup_method(self):
+        for p in self._class_patches:
+            p.start()
+
+    def teardown_method(self):
+        for p in self._class_patches:
+            p.stop()
+
     def _call(self, messages=None, verbose=False, timeout=30.0, model=None):
         if messages is None:
             messages = _make_claude_messages("result text")

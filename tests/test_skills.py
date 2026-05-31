@@ -125,9 +125,10 @@ class TestDryRun:
         assert "dry-run" in output.lower() or "dry_run" in output.lower() or "dry" in output
 
     def test_query_never_called(self):
+        backend_mock = MagicMock()
         with (
             patch.object(_ConcreteAgent, "_base_prompt", return_value="BASE"),
-            patch("agent.agents._base.query") as mock_query,
+            patch("agent.backends.claude.query", backend_mock),
         ):
             asyncio.run(_ConcreteAgent.run("anything", dry_run=True))
-            mock_query.assert_not_called()
+            backend_mock.assert_not_called()
