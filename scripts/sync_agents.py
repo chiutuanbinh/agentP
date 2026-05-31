@@ -106,12 +106,10 @@ def main():
         out_path = OUT_DIR / f"{name}.md"
 
         if args.dry_run:
-            print(f"=== {out_path} ===")
-            print(content[:300])
-            print("...\n")
+            sys.stdout.write(f"=== {out_path} ===\n{content[:300]}\n...\n\n")
         else:
             out_path.write_text(content)
-            print(f"wrote {out_path.relative_to(REPO_ROOT)}")
+            sys.stdout.write(f"wrote {out_path.relative_to(REPO_ROOT)}\n")
 
 
 if __name__ == "__main__":

@@ -30,17 +30,17 @@ async def main():
 
     agent_cls = AGENTS.get(agent_name)
     if agent_cls is None:
-        print(f"Unknown agent '{agent_name}'. Choose from: {', '.join(AGENTS)}")
+        sys.stdout.write(f"Unknown agent '{agent_name}'. Choose from: {', '.join(AGENTS)}\n")
         sys.exit(1)
 
     if prompt is None:
-        print(f"=== {agent_name} system prompt ===\n")
-        print(agent_cls.system_prompt())
-        print(f"\n=== allowed tools ===\n{agent_cls.allowed_tools()}")
+        sys.stdout.write(f"=== {agent_name} system prompt ===\n\n")
+        sys.stdout.write(agent_cls.system_prompt() + "\n")
+        sys.stdout.write(f"\n=== allowed tools ===\n{agent_cls.allowed_tools()}\n")
         return
 
     result = await agent_cls.run(prompt, verbose=True)
-    print(f"\n=== result ===\n{result}")
+    sys.stdout.write(f"\n=== result ===\n{result}\n")
 
 
 asyncio.run(main())
