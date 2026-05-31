@@ -1,0 +1,46 @@
+name: Claude Code Review
+
+on:
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Claude CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Get PR diff
+        id: diff
+        run: |
+          git diff origin/${{ github.base_ref }}...HEAD > pr.diff
+          echo "DIFF_SIZE=$(wc -c < pr.diff)" >> $GITHUB_ENV
+
+      - name: Run Claude review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          REVIEW=$(claude -p "You are a code reviewer. Review this PR diff and give concise feedback. Flag bugs (🔴), risks (🟡), nits (🔵). Format: \`file:line: emoji type: problem. fix.\` If no issues, say 'LGTM'. Diff:\n\`\`\`\n$(cat pr.diff)\n\`\`\`")
+          echo "REVIEW<<EOF" >> $GITHUB_ENV
+          echo "$REVIEW" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Post review comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "## Claude Code Review
+
+          ${{ env.REVIEW }}
+
+          ---
+          🤖 Reviewed by Claude \`claude-sonnet-4-6\`"
