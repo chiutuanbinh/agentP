@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# pre-push hook: regenerate CLAUDE.md Architecture section before push.
+# If CLAUDE.md changes, auto-commits the update so the push includes it.
+#
+# Install: git config core.hooksPath .githooks
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+echo "[pre-push] Checking CLAUDE.md…"
+
+# Run the updater. Exit 0 = no change, exit 1 = file updated.
+if uv run --project "$REPO_ROOT" python "$REPO_ROOT/scripts/update_claude_md.py"; then
+    echo "[pre-push] CLAUDE.md unchanged."
+    exit 0
+fi
+
+# CLAUDE.md was updated — commit it on top of the current branch.
+echo "[pre-push] CLAUDE.md updated; committing…"
+
+git -C "$REPO_ROOT" add CLAUDE.md
+git -C "$REPO_ROOT" commit \
+    --no-verify \
+    -m "chore(docs): auto-update CLAUDE.md architecture section
+
+[skip ci]"
+
+echo "[pre-push] CLAUDE.md commit added to push."
