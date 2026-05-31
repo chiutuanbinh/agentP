@@ -51,18 +51,47 @@ Three agent experiments side-by-side:
 - `buggy.py` — sample target for `agent_sdk.py` bug-review experiments
 
 **`agent/`** — Multi-agent system: ticket → PR workflow using Claude Agent SDK.
-- `run.py` — CLI entry; validates env, loads `.env`, dispatches to agent type (`--agent swe|pm|qa|arch|security|agent_builder`)
-- `agents/_base.py` — `BaseAgent`: template method for prompt assembly, tool union, Langfuse tracing, SDK query loop with timeout
-- `agents/{swe,pm,qa,arch,security,agent_builder}.py` — one class + `run()` per agent type
-- `skills/{jira,github,confluence,code_tools,testing,security_audit,agent_builder_docs}.py` — composable skill units (tools + prompt section)
-- `prompts/{swe,pm,qa,arch,security,agent_builder}.md` — system prompts, one per agent
+- `run.py` — CLI entry; validates env, loads `.env`, dispatches to agent type (`--agent agent_builder|arch|pm|qa|security|swe`)
+- `agents/_base.py` — `BaseAgent`: template method for prompt assembly, tool union, Langfuse tracing, backend dispatch
+- `agents/{...}.py` — one class + `run()` per agent type (see below)
+- `backends/{...}.py` — LLMBackend strategy layer: `claude`, `copilot`
+- `skills/{...}.py` — composable skill units (tools + prompt section)
+- `prompts/{...}.md` — system prompts, one per agent
 - `jira_client.py` — Jira REST API CLI; agent invokes via `Bash`: `python jira_client.py get|search|comment|transition <args>`
 - `wiki_client.py` — Confluence REST API CLI; agent invokes via `Bash`: `python wiki_client.py search|get|get-by-title <args>`
 
-**`mcp_claude_docs.py`** — MCP server for Claude Agent SDK docs (registered in `.mcp.json` as `claude-sdk-docs`).
+**Agents** (`agent/agents/`):
+- `agent_builder.py` (`agent_builder`) — Agent builder — creates new agents using Claude Agent SDK and Langfuse docs
+- `arch.py` (`arch`) — Architecture agent — design review, ADR writing, systemic code issues
+- `pm.py` (`pm`) — PM agent — ticket management, spec writing, epic decomposition
+- `qa.py` (`qa`) — QA agent — test planning, PR review, bug reporting
+- `security.py` (`security`) — Security agent — vulnerability audit, findings, remediation tickets
+- `swe.py` (`swe`) — SWE agent — ticket-to-PR workflow
 
-**`mcp_langfuse_docs.py`** — MCP server for Langfuse docs + local OpenAPI spec (registered as `langfuse-docs`). `.mcp.json` also registers `langfuse-official` (remote HTTP MCP at `https://langfuse.com/api/mcp`).
+**Backends** (`agent/backends/`) — LLMBackend strategy:
+- `claude.py` (`name="claude"`) — Claude backend — runs agents via Claude Agent SDK (claude-code subprocess)
+- `copilot.py` (`name="copilot"`) — Copilot backend — runs agents via GitHub Copilot SDK
 
+**Skills** (`agent/skills/`) — composable tool + prompt units:
+- `agent_builder_docs.py` (`agent_builder_docs`) — Agent builder docs skill — MCP tools for Claude Agent SDK and Langfuse docs
+- `code_tools.py` (`code_tools`) — Code tools skill — linting, formatting, git workflow guidance
+- `confluence.py` (`confluence`) — Confluence skill — wiki search and retrieval via wiki_client.py
+- `copilot.py` (`copilot`) — GitHub Copilot SDK skill — MCP tools for interacting with GitHub Copilot
+- `github.py` (`github`) — GitHub skill — gh CLI interactions
+- `jira.py` (`jira`) — Jira skill — ticket CRUD via jira_client.py
+- `langfuse.py` (`langfuse`) — Langfuse skill — query traces and observations at runtime
+- `security_audit.py` (`security_audit`) — Security audit skill — vulnerability review and audit guidance
+- `slack.py` (`slack`) — Slack skill — post notifications via webhook or CLI
+- `testing.py` (`testing`) — Testing skill — test writing, coverage, and QA guidance
+
+**MCP servers** (root):
+- `mcp_claude_docs.py` (`claude-sdk-docs`) — MCP server for fetching live Claude SDK documentation
+- `mcp_copilot.py` (`copilot-sdk`) — MCP server exposing GitHub Copilot SDK as tools for agent_builder
+- `mcp_langfuse_docs.py` (`langfuse-docs`) — MCP server for Langfuse documentation and local OpenAPI spec
+
+**Scripts** (`scripts/`):
+- `sync_agents.py` — Sync agent/ Python definitions → .claude/agents/*.md
+- `update_claude_md.py` — Regenerate the Architecture section of CLAUDE.md from current codebase state
 ## Environment variables
 
 Required for `agent/`:
@@ -149,3 +178,57 @@ curl -o /tmp/langfuse-compose.yml https://raw.githubusercontent.com/langfuse/lan
 docker compose -f /tmp/langfuse-compose.yml up -d
 # UI at http://localhost:3000
 ```
+
+## Architecture
+
+Three agent experiments side-by-side:
+
+**`adk/`** — Google ADK agent (`google-adk`). Entry: `root_agent` in `adk/agent.py`. Run via `adk web`. Session state in `adk/.adk/session.db` (gitignored).
+
+**`claude/`** — Anthropic Claude experiments:
+- `llm_api.py` — direct Messages API (`anthropic` SDK)
+- `agent_sdk.py` — Claude Agent SDK `query()`, spins up Claude Code subprocess with `Read`/`Edit`/`Glob` tools in `acceptEdits` mode
+- `buggy.py` — sample target for `agent_sdk.py` bug-review experiments
+
+**`agent/`** — Multi-agent system: ticket → PR workflow using Claude Agent SDK.
+- `run.py` — CLI entry; validates env, loads `.env`, dispatches to agent type (`--agent agent_builder|arch|pm|qa|security|swe`)
+- `agents/_base.py` — `BaseAgent`: template method for prompt assembly, tool union, Langfuse tracing, backend dispatch
+- `agents/{...}.py` — one class + `run()` per agent type (see below)
+- `backends/{...}.py` — LLMBackend strategy layer: `claude`, `copilot`
+- `skills/{...}.py` — composable skill units (tools + prompt section)
+- `prompts/{...}.md` — system prompts, one per agent
+- `jira_client.py` — Jira REST API CLI; agent invokes via `Bash`: `python jira_client.py get|search|comment|transition <args>`
+- `wiki_client.py` — Confluence REST API CLI; agent invokes via `Bash`: `python wiki_client.py search|get|get-by-title <args>`
+
+**Agents** (`agent/agents/`):
+- `agent_builder.py` (`agent_builder`) — Agent builder — creates new agents using Claude Agent SDK and Langfuse docs
+- `arch.py` (`arch`) — Architecture agent — design review, ADR writing, systemic code issues
+- `pm.py` (`pm`) — PM agent — ticket management, spec writing, epic decomposition
+- `qa.py` (`qa`) — QA agent — test planning, PR review, bug reporting
+- `security.py` (`security`) — Security agent — vulnerability audit, findings, remediation tickets
+- `swe.py` (`swe`) — SWE agent — ticket-to-PR workflow
+
+**Backends** (`agent/backends/`) — LLMBackend strategy:
+- `claude.py` (`name="claude"`) — Claude backend — runs agents via Claude Agent SDK (claude-code subprocess)
+- `copilot.py` (`name="copilot"`) — Copilot backend — runs agents via GitHub Copilot SDK
+
+**Skills** (`agent/skills/`) — composable tool + prompt units:
+- `agent_builder_docs.py` (`agent_builder_docs`) — Agent builder docs skill — MCP tools for Claude Agent SDK and Langfuse docs
+- `code_tools.py` (`code_tools`) — Code tools skill — linting, formatting, git workflow guidance
+- `confluence.py` (`confluence`) — Confluence skill — wiki search and retrieval via wiki_client.py
+- `copilot.py` (`copilot`) — GitHub Copilot SDK skill — MCP tools for interacting with GitHub Copilot
+- `github.py` (`github`) — GitHub skill — gh CLI interactions
+- `jira.py` (`jira`) — Jira skill — ticket CRUD via jira_client.py
+- `langfuse.py` (`langfuse`) — Langfuse skill — query traces and observations at runtime
+- `security_audit.py` (`security_audit`) — Security audit skill — vulnerability review and audit guidance
+- `slack.py` (`slack`) — Slack skill — post notifications via webhook or CLI
+- `testing.py` (`testing`) — Testing skill — test writing, coverage, and QA guidance
+
+**MCP servers** (root):
+- `mcp_claude_docs.py` (`claude-sdk-docs`) — MCP server for fetching live Claude SDK documentation
+- `mcp_copilot.py` (`copilot-sdk`) — MCP server exposing GitHub Copilot SDK as tools for agent_builder
+- `mcp_langfuse_docs.py` (`langfuse-docs`) — MCP server for Langfuse documentation and local OpenAPI spec
+
+**Scripts** (`scripts/`):
+- `sync_agents.py` — Sync agent/ Python definitions → .claude/agents/*.md
+- `update_claude_md.py` — Regenerate the Architecture section of CLAUDE.md from current codebase state
