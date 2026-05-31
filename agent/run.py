@@ -40,7 +40,7 @@ def main() -> None:
         "--agent",
         "-a",
         default="swe",
-        choices=["swe", "pm", "qa", "arch", "security"],
+        choices=["swe", "pm", "qa", "arch", "security", "agent_builder"],
         help="Agent type (default: swe)",
     )
     parser.add_argument("--repo", help="Repo path (swe: existing checkout; security: owner/repo)")
@@ -117,6 +117,15 @@ async def _dispatch(args) -> str:
             repo=args.repo,
             verbose=args.verbose,
         )
+
+    if agent == "agent_builder":
+        from agent.agents.agent_builder import run
+
+        if not args.task:
+            print("agent_builder requires --task", file=sys.stderr)
+            sys.exit(1)
+        print(f"Starting Agent Builder — {args.task}...")
+        return await run(args.task, verbose=args.verbose)
 
     print(f"Unknown agent: {agent}", file=sys.stderr)
     sys.exit(1)
