@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git workflow
+
+Every task: create fresh branch from default branch → make changes → open PR. Never commit directly to main or any other existing branch.
+
 ## Commands
 
 ```bash
